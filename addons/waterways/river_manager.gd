@@ -130,8 +130,8 @@ signal progress_notified
 #signal albedo_set
 
 # Internal Methods
-func _get_property_list() -> Array:
-	var props = [
+func _get_property_list() -> Array[Dictionary]:
+	var props: Array[Dictionary] = [
 		{
 			name = "Shape",
 			type = TYPE_NIL,
@@ -181,7 +181,7 @@ func _get_property_list() -> Array:
 		},
 	]
 
-	var props2 = []
+	var props2: Array[Dictionary] = []
 	var mat_categories = MATERIAL_CATEGORIES.duplicate(true)
 	
 	if _material.shader != null:
@@ -210,7 +210,7 @@ func _get_property_list() -> Array:
 				cp.hint = PROPERTY_HINT_EXP_EASING
 				cp.hint_string = "EASE"
 			props2.append(cp)
-	var props3 = [
+	var props3: Array[Dictionary] = [
 		{
 			name = "Lod",
 			type = TYPE_NIL,
@@ -329,7 +329,10 @@ func _get_property_list() -> Array:
 			usage = PROPERTY_USAGE_STORAGE
 		}
 	]
-	var combined_props = props + props2 + props3
+	var combined_props: Array[Dictionary] = []
+	combined_props.append_array(props)
+	combined_props.append_array(props2)
+	combined_props.append_array(props3)
 	
 	return combined_props
 
@@ -347,6 +350,7 @@ func _get(property : StringName):
 	if str(property).begins_with("mat_"):
 		var param_name : String = str(property).replace("mat_", "")
 		return _material.get_shader_parameter(param_name)
+	return null
 
 
 func _property_can_revert(property : StringName) -> bool:
@@ -369,6 +373,7 @@ func _property_get_revert(property : StringName):
 	
 	if DEFAULT_PARAMETERS.has(property):
 		return DEFAULT_PARAMETERS[property]
+	return null
 
 
 func _init() -> void:
@@ -678,10 +683,7 @@ func _generate_flowmap(flowmap_resolution : float) -> void:
 #	flow_map.get_image().save_png("res://test_assets/flow_map.png")
 #	blurred_flow_map.get_image().save_png("res://test_assets/blurred_flow_map.png")
 	
-	remove_child(renderer_instance) # cleanup
-	
-	var flow_foam_noise_result = flow_foam_noise_img.get_image().get_region(Rect2(margin, margin, flowmap_resolution, flowmap_resolution))
-	var dist_pressure_result = dist_pressure_img.get_image().get_region(Rect2(margin, margin, flowmap_resolution, flowmap_resolution))
+	renderer_instance.queue_free()
 	
 	flow_foam_noise = flow_foam_noise_img
 	dist_pressure = dist_pressure_img

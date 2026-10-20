@@ -181,6 +181,7 @@ func _get_handle_value(gizmo: EditorNode3DGizmo, index: int, secondary: bool):
 		return river.curve.get_point_out(_get_curve_index(index, point_count))
 	if _is_width_point_left(index, point_count) or _is_width_point_right(index, point_count):
 		return river.widths[_get_curve_index(index, point_count)]
+	return null
 
 
 # Called when handle is moved
